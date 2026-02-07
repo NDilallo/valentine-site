@@ -155,6 +155,13 @@
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
         }
 
+        .notified-text {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #888;
+            font-style: italic;
+        }
+
         /* ========== Confetti ========== */
         .confetti {
             position: fixed;
@@ -394,6 +401,8 @@
             <img src="ai-chinese-cat-dancing.gif" alt="Dancing cat!">
         </div>
         <div class="achievement" id="achievementText">✅ Correct answer detected</div>
+        <p class="notified-text">Nick has been notified and is very pleased :)</p>
+        <button class="error-reset" id="resetBtnYes">Clicking 'yes' was so fun you wanna do it again?</button>
     </div>
 
     <div class="management visible" id="management">
@@ -419,7 +428,7 @@
                 <span>Incident reported</span>
                 <span class="error-blink">🚨</span>
             </div>
-            <button class="error-reset" id="resetBtn">Having second thoughts?</button>
+            <button class="error-reset" id="resetBtnNo">Having second thoughts?</button>
         </div>
     </div>
 
@@ -449,11 +458,14 @@
         const questionTexts = [
             { dodges: 0, text: "Наталья, ты будешь моей валентинкой? 💝" },
             { dodges: 2, text: "Was that intentional? 🤔" },
-            { dodges: 5, text: "9/10 Dentists recommend Nick Dilallo" },
-            { dodges: 8, text: "Remember who you're rejecting:", image: "dressed_up.png" },
-            { dodges: 10, text: "Remember who you're rejecting:", image: "toothpic.png" },
-            { dodges: 12, text: "Remember who you're rejecting:", image: "love_feet.jpeg" },
-            { dodges: 14, text: "Last chance to say yes! 💘" }
+            { dodges: 4, text: "9/10 Dentists recommend Nick Dilallo" },
+            { dodges: 6, text: "Remember who you're rejecting:", image: "dressed_up.png" },
+            { dodges: 7, text: "Remember who you're rejecting:", image: "toothpic.png" },
+            { dodges: 8, text: "Remember who you're rejecting:", image: "love_feet.jpeg" },
+            { dodges: 9, text: "Saffie would not approve", image: "me_saffie1.jpeg" },
+            { dodges: 10, text: "Saffie would not approve", image: "me_saffie2.jpeg" },
+            { dodges: 11, text: "Saffie would not approve", image: "me_saffie_asleep.jpeg" },
+            { dodges: 12, text: "Last chance to say yes! 💘" }
         ];
 
         // Page title progression
@@ -461,7 +473,7 @@
             { dodges: 0, text: "Valentine? 💝" },
             { dodges: 3, text: "😳 Please??" },
             { dodges: 7, text: "PLEASE 🙏" },
-            { dodges: 14, text: "😮‍💨 I give up..." }
+            { dodges: 12, text: "😮‍💨 I give up..." }
         ];
 
         // Idle messages with timing
@@ -488,7 +500,7 @@
             { dodges: 7, text: "You are making a mistake." },
             { dodges: 9, text: "I'm not asking anymore." },
             { dodges: 11, text: "Sunbum is unhappy." },
-            { dodges: 13, text: "Fine. I'll allow it. This time." }
+            { dodges: 12, text: "Fine. I'll allow it. This time." }
         ];
 
         // ========== State Variables ========== //
@@ -496,7 +508,8 @@
         let idleTimer = null;
         let currentIdleLevel = 0;
         let hasSurrendered = false;
-        const MAX_DODGES = 14; // After this many dodges, button surrenders
+        let gameEnded = false;
+        const MAX_DODGES = 12; // After this many dodges, button surrenders
 
         // ========== DOM Elements ========== //
         const questionText = document.getElementById('questionText');
@@ -693,6 +706,7 @@
             // Clear any idle timers
             clearTimeout(idleTimer);
             idleMessage.classList.remove('visible');
+            gameEnded = true;
 
             // Send email notification to Nick
             sendNotification('yes');
@@ -720,6 +734,7 @@
             management.classList.remove('visible');
             idleMessage.classList.remove('visible');
             clearTimeout(idleTimer);
+            gameEnded = true;
 
             // Show error page
             const errorPage = document.getElementById('errorPage');
@@ -737,10 +752,14 @@
             const errorPage = document.getElementById('errorPage');
             errorPage.classList.remove('active');
 
+            // Hide celebration page
+            celebration.classList.remove('active');
+
             // Reset state variables
             dodgeCount = 0;
             hasSurrendered = false;
             currentIdleLevel = 0;
+            gameEnded = false;
 
             // Reset No button
             noBtn.textContent = noButtonTexts[0];
@@ -801,6 +820,8 @@
          * Reset the idle timer
          */
         function resetIdleTimer() {
+            if (gameEnded) return; // Don't restart idle timer after game ends
+            
             clearTimeout(idleTimer);
             currentIdleLevel = 0;
             idleMessage.classList.remove('visible');
@@ -850,8 +871,9 @@
         // Yes button click handler
         yesBtn.addEventListener('click', triggerCelebration);
 
-        // Reset button click handler (on 404 page)
-        document.getElementById('resetBtn').addEventListener('click', resetPage);
+        // Reset button click handlers (on Yes and No pages)
+        document.getElementById('resetBtnYes').addEventListener('click', resetPage);
+        document.getElementById('resetBtnNo').addEventListener('click', resetPage);
 
         // Reset idle timer on any interaction
         document.addEventListener('mousemove', resetIdleTimer);
