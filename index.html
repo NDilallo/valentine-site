@@ -110,7 +110,17 @@
             display: none;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             gap: 1.5rem;
+            padding: 2rem 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 50%, #ffd6e0 100%);
+            z-index: 500;
         }
 
         .celebration.active {
@@ -218,6 +228,35 @@
 
             .buttons {
                 gap: 1rem;
+            }
+
+            .celebration {
+                gap: 1rem;
+                padding: 1rem 0.5rem 3rem;
+            }
+
+            .celebration-text {
+                font-size: clamp(1.3rem, 6vw, 2rem);
+            }
+
+            .gif-row {
+                gap: 0.75rem;
+            }
+
+            .gif-row img {
+                max-width: 100px;
+                max-height: 100px;
+            }
+
+            .achievement {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .error-reset {
+                margin-top: 1.5rem;
+                font-size: 0.85rem;
+                padding: 0.7rem 1.2rem;
             }
         }
 
@@ -525,7 +564,7 @@
         // ========== Helper Functions ========== //
 
         /**
-         * Get a random position within the viewport with padding
+         * Get a random position within the viewport with padding, avoiding overlaps (mobile-friendly)
          * @returns {Object} { x, y } coordinates
          */
         function getRandomPosition() {
@@ -533,11 +572,31 @@
             const btnRect = noBtn.getBoundingClientRect();
             const maxX = window.innerWidth - btnRect.width - padding;
             const maxY = window.innerHeight - btnRect.height - padding;
-            
-            return {
-                x: Math.max(padding, Math.random() * maxX),
-                y: Math.max(padding, Math.random() * maxY)
-            };
+
+            let x, y;
+            let isOverlapping;
+
+            do {
+                x = Math.max(padding, Math.random() * maxX);
+                y = Math.max(padding, Math.random() * maxY);
+
+                // Check for overlaps with other elements
+                isOverlapping = [...document.querySelectorAll('.question, .question-img, .gif-row img')].some(el => {
+                    const rect = el.getBoundingClientRect();
+
+                    // Adjust overlap detection for smaller screens
+                    const overlapBuffer = window.innerWidth <= 480 ? 10 : 0;
+
+                    return (
+                        x < rect.right + overlapBuffer &&
+                        x + btnRect.width > rect.left - overlapBuffer &&
+                        y < rect.bottom + overlapBuffer &&
+                        y + btnRect.height > rect.top - overlapBuffer
+                    );
+                });
+            } while (isOverlapping);
+
+            return { x, y };
         }
 
         /**
