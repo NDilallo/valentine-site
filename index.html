@@ -120,21 +120,137 @@
         }
 
         /* ========== Celebration Mode ========== */
-        .celebration {
-            display: none;
+         .celebration {
+          display: none;               /* <-- hide by default */
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 1.5rem;
+          padding: 2rem 1rem;
+                
+          position: fixed;
+          inset: 0;
+          overflow-y: auto;
+                
+          background: none;            /* let collage show */
+          z-index: 500;
+        }
+
+        /* Fixed background layer behind celebration content */
+        .celebration-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 50%, #ffd6e0 100%);
+            pointer-events: none;
+        }
+
+        /* Readability overlay above images but below content */
+        .celebration-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 240, 245, 0.65);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        /* Foreground content above everything */
+        .celebration-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
             gap: 1.5rem;
-            padding: 2rem 1rem;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow-y: auto;
-            background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 50%, #ffd6e0 100%);
-            z-index: 500;
+        }
+
+        /* The photo cards */
+        .bg-img {
+            position: absolute;
+            width: clamp(220px, 55vw, 380px);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            opacity: 0.85;
+            filter: saturate(0.95);
+            transform-origin: center;
+            --base-rotate: -6deg;
+            animation: float 12s ease-in-out infinite;
+        }
+
+        /* Positions / rotations (tweak freely) */
+        .bg-img.img-1 {
+            top: 6%;
+            left: 4%;
+            transform: rotate(-6deg);
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .bg-img.img-2 {
+            bottom: 8%;
+            right: 5%;
+            transform: rotate(5deg);
+            animation: float 12s ease-in-out infinite;
+        }
+
+        /* .bg-img.img-3 {
+            top: 42%;
+            left: 50%;
+            animation: float 14s ease-in-out infinite;
+        }
+
+        @keyframes float {
+          0%   { transform: translateY(0) rotate(calc(var(--base-rotate) - 8deg)); }
+          50%  { transform: translateY(-10px) rotate(calc(var(--base-rotate) + 8deg)); }
+          100% { transform: translateY(0) rotate(calc(var(--base-rotate) - 8deg)); }
+        } */
+         .bg-img.img-3 {
+          top: 42%;
+          left: 50%;
+          --base-rotate: -2deg;
+          animation: float-center 14s ease-in-out infinite; /* <— different animation */
+        }
+
+        @keyframes float-center {
+          0%, 100% {
+            transform: translateX(-50%) translateY(0) rotate(calc(var(--base-rotate) - 8deg));
+          }
+          50% {
+            transform: translateX(-50%) translateY(-10px) rotate(calc(var(--base-rotate) + 8deg));
+          }
+        }
+
+
+
+        /* Mobile tuning: smaller + keep center clearer */
+        @media (max-width: 480px) {
+            .bg-img {
+                width: clamp(180px, 70vw, 320px);
+                opacity: 0.75;
+            }
+        
+            .bg-img.img-1 {
+                top: 3%;
+                left: -10%;
+                transform: rotate(-7deg);
+            }
+        
+            .bg-img.img-2 {
+                bottom: 6%;
+                right: -12%;
+                transform: rotate(6deg);
+            }
+        
+            .bg-img.img-3 {
+                top: 52%;
+                left: 50%;
+                transform: translateX(-50%) rotate(-2deg);
+            }
+        
+            .celebration-overlay {
+                background: rgba(255, 240, 245, 0.72);
+            }
         }
 
         .celebration.active {
@@ -182,7 +298,7 @@
         .notified-text {
             margin-top: 1rem;
             font-size: 1rem;
-            color: #888;
+            color: #000000;
             font-style: italic;
         }
 
@@ -439,7 +555,7 @@
             padding: 0.8rem 1.5rem;
             background: transparent;
             border: 2px solid #555;
-            color: #888;
+            color: #af1616;
             font-size: 0.9rem;
             border-radius: 25px;
             cursor: pointer;
@@ -472,27 +588,39 @@
 
     <!-- Celebration Content -->
     <div class="celebration" id="celebration">
-        <h1 class="celebration-text">CORRECT CHOICE</h1>
-        <h1 class="celebration-text">LET'S GOOOOOOOOOOOOOOOO 🎉💖</h1>
-        <div class="gif-row">
-            <img src="IMG_1216.gif" alt="Dancing!">
-            <img class="celebration-gif" 
-                 src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXBtOWpmNnJha3RraTlkOXE0ZmJ4NzVtOWV6OGFoajFkZnEwbjkwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif" 
-                 alt="Celebration!">
-            <img src="ai-chinese-cat-dancing.gif" alt="Dancing cat!">
+        <!-- Background collage (behind celebration content) -->
+        <div class="celebration-bg" aria-hidden="true">
+            <img src="collage1.jpeg" class="bg-img img-1" alt="">
+            <img src="collage2.jpeg" class="bg-img img-2" alt="">
+            <img src="card_edit.jpeg" class="bg-img img-3" alt="">
+            <div class="celebration-overlay"></div>
         </div>
-        <div class="achievement" id="achievementText">✅ Correct answer detected</div>
-        <p class="notified-text">Nick has been notified and is very pleased :)</p>
-        <button class="error-reset" id="resetBtnYes">Clicking 'yes' was so fun you wanna do it again?</button>
+
+        <!-- Foreground content -->
+        <div class="celebration-content">
+            <h1 class="celebration-text">CORRECT CHOICE</h1>
+            <h1 class="celebration-text">LET'S GOOOOOOOOOOOOOOOO 🎉💖</h1>
+            <div class="gif-row">
+                <img src="IMG_1216.gif" alt="Dancing!">
+                <img class="celebration-gif"
+                     src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXBtOWpmNnJha3RraTlkOXE0ZmJ4NzVtOWV6OGFoajFkZnEwbjkwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif"
+                     alt="Celebration!">
+                <img src="ai-chinese-cat-dancing.gif" alt="Dancing cat!">
+            </div>
+            <div class="achievement" id="achievementText">✅ Correct answer detected</div>
+            <p class="notified-text">Nick has been notified and is very pleased :)</p>
+            <button class="error-reset" id="resetBtnYes">Clicking 'yes' was so fun you wanna do it again?</button>
+        </div>
     </div>
 
     <div class="management visible" id="management">
-        <img src="saffie.png" alt="Saffie - Management" class="management-img">
-        <div class="management-bubble" id="managementBubble">
-            <span class="management-title">🐱 Management says:</span>
-            <p class="management-text" id="managementText">I recommend Yes.</p>
-        </div>
+      <img src="saffie.png" alt="Saffie - Management" class="management-img">
+      <div class="management-bubble" id="managementBubble">
+        <span class="management-title">🐱 Management says:</span>
+        <p class="management-text" id="managementText">I recommend Yes.</p>
+      </div>
     </div>
+
 
     <!-- Idle Message -->
     <div class="idle-message" id="idleMessage"></div>
@@ -539,7 +667,7 @@
         const questionTexts = [
             { dodges: 0, text: "Наталья, ты будешь моей валентинкой? 💝" },
             { dodges: 2, text: "Was that intentional? 🤔" },
-            { dodges: 4, text: "9/10 Dentists recommend Nick Dilallo" },
+            { dodges: 4, text: "9/10 Professionals recommend Nick Dilallo" },
             { dodges: 6, text: "Remember who you're rejecting:", image: "dressed_up.png" },
             { dodges: 7, text: "Remember who you're rejecting:", image: "toothpic.png" },
             { dodges: 8, text: "Remember who you're rejecting:", image: "love_feet.jpeg" },
