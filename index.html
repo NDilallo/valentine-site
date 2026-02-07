@@ -57,6 +57,20 @@
             flex-wrap: wrap;
         }
 
+        .shy-hint {
+            margin-top: 1rem;
+            margin-left: 15rem;
+            font-size: 0.9rem;
+            color: #000000;
+            font-style: italic;
+            animation: gentle-bounce 1.5s ease-in-out infinite;
+        }
+
+        @keyframes gentle-bounce {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-5px, -5px); }
+        }
+
         .btn {
             padding: 1rem 2.5rem;
             font-size: 1.3rem;
@@ -258,6 +272,33 @@
                 font-size: 0.85rem;
                 padding: 0.7rem 1.2rem;
             }
+
+            .management {
+                bottom: auto;
+                right: 0.5rem;
+                flex-direction: column-reverse;
+                align-items: flex-end;
+            }
+
+            .management-bubble {
+                max-width: 180px;
+            }
+
+            .management-bubble::after {
+                right: 20px;
+                bottom: -18px;
+                border: 10px solid transparent;
+                border-top-color: white;
+            }
+
+            .management-img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .idle-message {
+                bottom: 1rem;
+            }
         }
 
         /* ========== Management (Cat) ========== */
@@ -426,6 +467,7 @@
             <button class="btn btn-yes" id="yesBtn">Yes</button>
             <button class="btn btn-no" id="noBtn">No</button>
         </div>
+        <p class="shy-hint" id="shyHint">↖ he's shy</p>
     </div>
 
     <!-- Celebration Content -->
@@ -560,6 +602,7 @@
         const achievementText = document.getElementById('achievementText');
         const management = document.getElementById('management');
         const managementText = document.getElementById('managementText');
+        const shyHint = document.getElementById('shyHint');
 
         // ========== Helper Functions ========== //
 
@@ -670,6 +713,11 @@
          */
         function dodgeNoButton() {
             if (hasSurrendered) return;
+            
+            // Hide the shy hint after first dodge
+            if (shyHint) {
+                shyHint.style.display = 'none';
+            }
             
             // Make button position fixed if not already
             if (!noBtn.classList.contains('fixed-position')) {
@@ -840,6 +888,11 @@
             managementText.textContent = managementMessages[0].text;
             management.classList.add('visible');
 
+            // Reset shy hint
+            if (shyHint) {
+                shyHint.style.display = '';
+            }
+
             // Show main container
             mainContainer.classList.remove('hidden');
 
@@ -907,6 +960,12 @@
         }
 
         // ========== Event Listeners ========== //
+
+        // Easter egg text
+        document.addEventListener('DOMContentLoaded', (e) => {
+            console.log("If you found this then you really are a CS grad...")
+            console.log("p.s. I think you're really cute ;)")
+        });
 
         // No button dodge on hover (desktop)
         noBtn.addEventListener('mouseenter', (e) => {
