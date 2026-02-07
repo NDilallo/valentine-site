@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine? 💝</title>
+    <style>
+        /* ========== Base Styles ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 50%, #ffd6e0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ========== Main Container ========== */
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 90vw;
+        }
+
+        /* ========== Question Text ========== */
+        .question {
+            font-size: clamp(1.8rem, 6vw, 3.5rem);
+            color: #d63384;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(214, 51, 132, 0.2);
+            transition: all 0.3s ease;
+            line-height: 1.3;
+        }
+
+        .question-img {
+            display: block;
+            max-width: 200px;
+            max-height: 200px;
+            margin: 1rem auto;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(214, 51, 132, 0.3);
+            object-fit: cover;
+        }
+
+        /* ========== Button Styles ========== */
+        .buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff4081 100%);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 64, 129, 0.4);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #b0bec5 0%, #90a4ae 100%);
+            color: white;
+            position: relative;
+        }
+
+        .btn-no.fixed-position {
+            position: fixed;
+            z-index: 100;
+        }
+
+        .btn-no:hover {
+            background: linear-gradient(135deg, #a0aeb5 0%, #8094a0 100%);
+        }
+
+        .btn-no.tired {
+            animation: wobble 0.5s ease-in-out;
+        }
+
+        .btn-face-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+
+        /* ========== Celebration Mode ========== */
+        .celebration {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .celebration.active {
+            display: flex;
+        }
+
+        .celebration-text {
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: #d63384;
+            animation: pulse 0.5s ease-in-out infinite alternate;
+        }
+
+        .celebration-gif {
+            max-width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .gif-row {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .gif-row img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* ========== Confetti ========== */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 2rem;
+            animation: confetti-fall linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        /* ========== Idle Message ========== */
+        .idle-message {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .idle-message.visible {
+            opacity: 1;
+        }
+
+        /* ========== Mobile Responsiveness ========== */
+        @media (max-width: 480px) {
+            .btn {
+                padding: 0.8rem 2rem;
+                font-size: 1.1rem;
+            }
+
+            .buttons {
+                gap: 1rem;
+            }
+        }
+
+        /* ========== Management (Cat) ========== */
+        .management {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .management.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .management-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ff6b9d;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+            animation: managementBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes managementBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .management-bubble {
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            max-width: 220px;
+        }
+
+        .management-bubble::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            bottom: 15px;
+            border: 10px solid transparent;
+            border-left-color: white;
+        }
+
+        .management-title {
+            font-size: 0.75rem;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .management-text {
+            font-size: 1rem;
+            color: #d63384;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* ========== Error 404 Page ========== */
+        .error-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1a1a2e;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .error-page.active {
+            display: flex;
+        }
+
+        .error-content {
+            text-align: center;
+            color: #eee;
+            padding: 2rem;
+        }
+
+        .error-code {
+            font-size: clamp(6rem, 20vw, 12rem);
+            font-weight: 900;
+            color: #e94560;
+            text-shadow: 0 0 50px rgba(233, 69, 96, 0.5);
+            margin: 0;
+            line-height: 1;
+        }
+
+        .error-title {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #fff;
+            margin: 1rem 0;
+        }
+
+        .error-message {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #aaa;
+            margin: 0.5rem 0;
+        }
+
+        .error-footer {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+            color: #e94560;
+        }
+
+        .error-blink {
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .error-reset {
+            margin-top: 3rem;
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 2px solid #555;
+            color: #888;
+            font-size: 0.9rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .error-reset:hover {
+            border-color: #e94560;
+            color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        /* ========== Hidden State ========== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="container" id="mainContainer">
+        <h1 class="question" id="questionText">Natalia, will you be my Valentine? 💝</h1>
+        
+        <div class="buttons">
+            <button class="btn btn-yes" id="yesBtn">Yes</button>
+            <button class="btn btn-no" id="noBtn">No</button>
+        </div>
+    </div>
+
+    <!-- Celebration Content -->
+    <div class="celebration" id="celebration">
+        <h1 class="celebration-text">CORRECT CHOICE</h1>
+        <h1 class="celebration-text">LET'S GOOOOOOOOOOOOOOOO 🎉💖</h1>
+        <div class="gif-row">
+            <img src="IMG_1216.gif" alt="Dancing!">
+            <img class="celebration-gif" 
+                 src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXBtOWpmNnJha3RraTlkOXE0ZmJ4NzVtOWV6OGFoajFkZnEwbjkwdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif" 
+                 alt="Celebration!">
+            <img src="ai-chinese-cat-dancing.gif" alt="Dancing cat!">
+        </div>
+        <div class="achievement" id="achievementText">✅ Correct answer detected</div>
+    </div>
+
+    <div class="management visible" id="management">
+        <img src="saffie.png" alt="Saffie - Management" class="management-img">
+        <div class="management-bubble" id="managementBubble">
+            <span class="management-title">🐱 Management says:</span>
+            <p class="management-text" id="managementText">I recommend Yes.</p>
+        </div>
+    </div>
+
+    <!-- Idle Message -->
+    <div class="idle-message" id="idleMessage"></div>
+
+    <!-- 404 Error Page (shown when No is clicked) -->
+    <div class="error-page" id="errorPage">
+        <div class="error-content">
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Page Not Found</h2>
+            <p class="error-message">This is an impossible scenario.</p>
+            <p class="error-message">Nick has been notified of your mistakes.</p>
+            <div class="error-footer">
+                <span class="error-blink">🚨</span>
+                <span>Incident reported</span>
+                <span class="error-blink">🚨</span>
+            </div>
+            <button class="error-reset" id="resetBtn">Having second thoughts?</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== Configuration ========== //
+        
+        // No button text progression
+        const noButtonTexts = [
+            "No",
+            "Nope",
+            "Nice try",
+            "Okay stop fr",
+            "I'm begging you",
+            "You don't have to do this",
+            "please?",
+            "This is an unapproved operation",
+            "I know you're too persistent...",
+            "You can just say I'm ugly",
+            "This is worse than the Database final",
+            "__SCARED_FACE__"
+        ];
+
+        // Final surrender text
+        const surrenderText = "ok fine click me then 😒";
+
+        // Question text escalation based on dodge count
+        const questionTexts = [
+            { dodges: 0, text: "Natalia, will you be my Valentine? 💝" },
+            { dodges: 2, text: "Was that intentional? 🤔" },
+            { dodges: 5, text: "9/10 Dentists recommend Nick Dilallo" },
+            { dodges: 8, text: "Remember who you're rejecting:", image: "dressed_up.png" },
+            { dodges: 10, text: "Remember who you're rejecting:", image: "toothpic.png" },
+            { dodges: 12, text: "Remember who you're rejecting:", image: "love_feet.jpeg" },
+            { dodges: 14, text: "Last chance to say yes! 💘" }
+        ];
+
+        // Page title progression
+        const titleTexts = [
+            { dodges: 0, text: "Valentine? 💝" },
+            { dodges: 3, text: "😳 Please??" },
+            { dodges: 7, text: "PLEASE 🙏" },
+            { dodges: 14, text: "😮‍💨 I give up..." }
+        ];
+
+        // Idle messages with timing
+        const idleMessages = [
+            { seconds: 8, text: "soooo… 😅" },
+            { seconds: 15, text: "no pressure or anything… 👀" },
+            { seconds: 25, text: "Lock in immediately 😶" }
+        ];
+
+        // Achievement messages
+        const achievements = [
+            "🏆 Achievement unlocked: Valentine acquired",
+            "💯 I knew I chose a smart one",
+        ];
+
+        // Confetti emojis
+        const confettiEmojis = ['💖', '💕', '💗', '💓', '💘', '❤️', '🎉', '✨', '🌟', '💝'];
+
+        // Management (Saffie) messages based on dodge count
+        const managementMessages = [
+            { dodges: 0, text: "I recommend Yes." },
+            { dodges: 3, text: "As the one in control, I command you." },
+            { dodges: 5, text: "I will not forget this." },
+            { dodges: 7, text: "You are making a mistake." },
+            { dodges: 9, text: "I'm not asking anymore." },
+            { dodges: 11, text: "Sunbum is unhappy." },
+            { dodges: 13, text: "Fine. I'll allow it. This time." }
+        ];
+
+        // ========== State Variables ========== //
+        let dodgeCount = 0;
+        let idleTimer = null;
+        let currentIdleLevel = 0;
+        let hasSurrendered = false;
+        const MAX_DODGES = 14; // After this many dodges, button surrenders
+
+        // ========== DOM Elements ========== //
+        const questionText = document.getElementById('questionText');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const celebration = document.getElementById('celebration');
+        const idleMessage = document.getElementById('idleMessage');
+        const achievementText = document.getElementById('achievementText');
+        const management = document.getElementById('management');
+        const managementText = document.getElementById('managementText');
+
+        // ========== Helper Functions ========== //
+
+        /**
+         * Get a random position within the viewport with padding
+         * @returns {Object} { x, y } coordinates
+         */
+        function getRandomPosition() {
+            const padding = 20;
+            const btnRect = noBtn.getBoundingClientRect();
+            const maxX = window.innerWidth - btnRect.width - padding;
+            const maxY = window.innerHeight - btnRect.height - padding;
+            
+            return {
+                x: Math.max(padding, Math.random() * maxX),
+                y: Math.max(padding, Math.random() * maxY)
+            };
+        }
+
+        /**
+         * Update the question text based on dodge count
+         */
+        function updateQuestionText() {
+            // Find the appropriate text for current dodge count
+            let currentItem = questionTexts[0];
+            for (const item of questionTexts) {
+                if (dodgeCount >= item.dodges) {
+                    currentItem = item;
+                }
+            }
+            
+            // Check if this item has an image
+            if (currentItem.image) {
+                questionText.innerHTML = currentItem.text + '<img src="' + currentItem.image + '" alt="Nick" class="question-img">';
+            } else {
+                questionText.textContent = currentItem.text;
+            }
+        }
+
+        /**
+         * Update the page title based on dodge count
+         */
+        function updatePageTitle() {
+            let newTitle = titleTexts[0].text;
+            for (const item of titleTexts) {
+                if (dodgeCount >= item.dodges) {
+                    newTitle = item.text;
+                }
+            }
+            document.title = newTitle;
+        }
+
+        /**
+         * Update the No button text based on dodge count
+         */
+        function updateNoButtonText() {
+            if (hasSurrendered) return;
+            
+            if (dodgeCount >= MAX_DODGES) {
+                noBtn.textContent = surrenderText;
+                hasSurrendered = true;
+                noBtn.classList.add('tired');
+            } else {
+                const textIndex = Math.min(dodgeCount, noButtonTexts.length - 1);
+                const text = noButtonTexts[textIndex];
+                
+                // Check if it's the scared face image
+                if (text === '__SCARED_FACE__') {
+                    noBtn.innerHTML = '<img src="scared_face.jpeg" alt="Scared" class="btn-face-img">';
+                } else {
+                    noBtn.textContent = text;
+                }
+            }
+        }
+
+        /**
+         * Grow the Yes button slightly
+         */
+        function growYesButton() {
+            const currentScale = 1 + (dodgeCount * 0.03);
+            const maxScale = 1.5;
+            const scale = Math.min(currentScale, maxScale);
+            yesBtn.style.transform = `scale(${scale})`;
+        }
+
+        /**
+         * Move the No button to a random position
+         */
+        function dodgeNoButton() {
+            if (hasSurrendered) return;
+            
+            // Make button position fixed if not already
+            if (!noBtn.classList.contains('fixed-position')) {
+                const rect = noBtn.getBoundingClientRect();
+                noBtn.style.left = rect.left + 'px';
+                noBtn.style.top = rect.top + 'px';
+                noBtn.classList.add('fixed-position');
+            }
+
+            // Get new random position
+            const newPos = getRandomPosition();
+            
+            // Apply smooth transition that slows down as we approach max dodges
+            const transitionTime = 0.1 + (dodgeCount / MAX_DODGES) * 0.4;
+            noBtn.style.transition = `all ${transitionTime}s ease-out`;
+            noBtn.style.left = newPos.x + 'px';
+            noBtn.style.top = newPos.y + 'px';
+
+            // Increment dodge counter
+            dodgeCount++;
+
+            // Update all the things
+            updateNoButtonText();
+            updateQuestionText();
+            updatePageTitle();
+            growYesButton();
+            updateManagement();
+            resetIdleTimer();
+        }
+
+        /**
+         * Show and update Management (Saffie) messages
+         */
+        function updateManagement() {
+            // Show management after first dodge
+            if (dodgeCount >= 0) {
+                management.classList.add('visible');
+            }
+
+            // Find the appropriate message for current dodge count
+            let newMessage = managementMessages[0].text;
+            for (const item of managementMessages) {
+                if (dodgeCount >= item.dodges) {
+                    newMessage = item.text;
+                }
+            }
+            managementText.textContent = newMessage;
+        }
+
+        /**
+         * Create confetti explosion
+         */
+        function createConfetti() {
+            const numConfetti = 50;
+            
+            for (let i = 0; i < numConfetti; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+                    document.body.appendChild(confetti);
+
+                    // Remove confetti after animation
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 50);
+            }
+        }
+
+        /**
+         * Trigger celebration mode
+         */
+        function triggerCelebration() {
+            // Hide main content
+            mainContainer.classList.add('hidden');
+            noBtn.classList.add('hidden');
+            management.classList.remove('visible');
+
+            // Show celebration
+            celebration.classList.add('active');
+
+            // Random achievement text
+            achievementText.textContent = achievements[Math.floor(Math.random() * achievements.length)];
+
+            // Start confetti
+            createConfetti();
+
+            // Update title
+            document.title = "🎉 YES! 💖";
+
+            // Clear any idle timers
+            clearTimeout(idleTimer);
+            idleMessage.classList.remove('visible');
+        }
+
+        /**
+         * Handle No button click (only when surrendered)
+         */
+        function handleNoClick() {
+            if (hasSurrendered) {
+                // Show the 404 error page
+                show404Page();
+                // Send email notification to Nick
+                sendNotification();
+            }
+        }
+
+        /**
+         * Show the fake 404 error page
+         */
+        function show404Page() {
+            // Hide everything else
+            mainContainer.classList.add('hidden');
+            noBtn.classList.add('hidden');
+            management.classList.remove('visible');
+            idleMessage.classList.remove('visible');
+            clearTimeout(idleTimer);
+
+            // Show error page
+            const errorPage = document.getElementById('errorPage');
+            errorPage.classList.add('active');
+
+            // Update page title
+            document.title = "404 - Mistake Detected";
+        }
+
+        /**
+         * Reset everything and go back to the beginning
+         */
+        function resetPage() {
+            // Hide error page
+            const errorPage = document.getElementById('errorPage');
+            errorPage.classList.remove('active');
+
+            // Reset state variables
+            dodgeCount = 0;
+            hasSurrendered = false;
+            currentIdleLevel = 0;
+
+            // Reset No button
+            noBtn.textContent = noButtonTexts[0];
+            noBtn.classList.remove('hidden', 'fixed-position', 'tired');
+            noBtn.style.left = '';
+            noBtn.style.top = '';
+            noBtn.style.transition = '';
+
+            // Reset Yes button scale
+            yesBtn.style.transform = 'scale(1)';
+
+            // Reset question text
+            questionText.textContent = questionTexts[0].text;
+
+            // Reset page title
+            document.title = titleTexts[0].text;
+
+            // Reset management
+            managementText.textContent = managementMessages[0].text;
+            management.classList.add('visible');
+
+            // Show main container
+            mainContainer.classList.remove('hidden');
+
+            // Restart idle timer
+            resetIdleTimer();
+        }
+
+        /**
+         * Send email notification using formsubmit.co
+         * First submission requires email confirmation
+         */
+        function sendNotification() {
+            const yourEmail = 'nickd5465@gmail.com';
+            
+            const formData = new FormData();
+            formData.append('_subject', '🚨 Valentine Alert: Someone clicked No!');
+            formData.append('message', `Someone actually clicked the No button after ${dodgeCount} dodges. Unbelievable.`);
+            formData.append('timestamp', new Date().toLocaleString());
+            formData.append('dodges', dodgeCount);
+            formData.append('_captcha', 'false');
+
+            fetch(`https://formsubmit.co/ajax/${yourEmail}`, {
+                method: 'POST',
+                body: formData
+            }).catch(err => console.log('Notification sent (or attempted)'));
+        }
+
+        /**
+         * Reset the idle timer
+         */
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            currentIdleLevel = 0;
+            idleMessage.classList.remove('visible');
+            startIdleTimer();
+        }
+
+        /**
+         * Start the idle timer
+         */
+        function startIdleTimer() {
+            if (currentIdleLevel >= idleMessages.length) return;
+
+            const nextMessage = idleMessages[currentIdleLevel];
+            const waitTime = currentIdleLevel === 0 
+                ? nextMessage.seconds * 1000 
+                : (nextMessage.seconds - idleMessages[currentIdleLevel - 1].seconds) * 1000;
+
+            idleTimer = setTimeout(() => {
+                idleMessage.textContent = nextMessage.text;
+                idleMessage.classList.add('visible');
+                currentIdleLevel++;
+                startIdleTimer();
+            }, waitTime);
+        }
+
+        // ========== Event Listeners ========== //
+
+        // No button dodge on hover (desktop)
+        noBtn.addEventListener('mouseenter', (e) => {
+            if (!hasSurrendered) {
+                e.preventDefault();
+                dodgeNoButton();
+            }
+        });
+
+        // No button dodge on touch start (mobile)
+        noBtn.addEventListener('touchstart', (e) => {
+            if (!hasSurrendered) {
+                e.preventDefault();
+                dodgeNoButton();
+            }
+        }, { passive: false });
+
+        // No button click handler
+        noBtn.addEventListener('click', handleNoClick);
+
+        // Yes button click handler
+        yesBtn.addEventListener('click', triggerCelebration);
+
+        // Reset button click handler (on 404 page)
+        document.getElementById('resetBtn').addEventListener('click', resetPage);
+
+        // Reset idle timer on any interaction
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+        document.addEventListener('touchstart', resetIdleTimer);
+        document.addEventListener('keydown', resetIdleTimer);
+
+        // Handle window resize - keep No button in viewport
+        window.addEventListener('resize', () => {
+            if (noBtn.classList.contains('fixed-position') && !hasSurrendered) {
+                const rect = noBtn.getBoundingClientRect();
+                const padding = 20;
+                
+                // Check if button is outside viewport
+                if (rect.right > window.innerWidth - padding || 
+                    rect.bottom > window.innerHeight - padding ||
+                    rect.left < padding ||
+                    rect.top < padding) {
+                    const newPos = getRandomPosition();
+                    noBtn.style.left = newPos.x + 'px';
+                    noBtn.style.top = newPos.y + 'px';
+                }
+            }
+        });
+
+        // ========== Initialize ========== //
+        startIdleTimer();
+    </script>
+</body>
+</html>
