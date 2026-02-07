@@ -693,6 +693,9 @@
             // Clear any idle timers
             clearTimeout(idleTimer);
             idleMessage.classList.remove('visible');
+
+            // Send email notification to Nick
+            sendNotification('yes');
         }
 
         /**
@@ -703,7 +706,7 @@
                 // Show the 404 error page
                 show404Page();
                 // Send email notification to Nick
-                sendNotification();
+                sendNotification('no');
             }
         }
 
@@ -769,13 +772,21 @@
         /**
          * Send email notification using formsubmit.co
          * First submission requires email confirmation
+         * @param {string} type - 'yes' or 'no'
          */
-        function sendNotification() {
+        function sendNotification(type) {
             const yourEmail = 'nickd5465@gmail.com';
             
             const formData = new FormData();
-            formData.append('_subject', '🚨 Valentine Alert: Someone clicked No!');
-            formData.append('message', `Someone actually clicked the No button after ${dodgeCount} dodges. Unbelievable.`);
+            
+            if (type === 'yes') {
+                formData.append('_subject', '🎉 Valentine Alert: Someone clicked Yes!');
+                formData.append('message', `Someone said YES after ${dodgeCount} dodges! 💖`);
+            } else {
+                formData.append('_subject', '🚨 Valentine Alert: Someone clicked No!');
+                formData.append('message', `Someone actually clicked the No button after ${dodgeCount} dodges. Unbelievable.`);
+            }
+            
             formData.append('timestamp', new Date().toLocaleString());
             formData.append('dodges', dodgeCount);
             formData.append('_captcha', 'false');
