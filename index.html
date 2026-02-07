@@ -27,7 +27,6 @@
             text-align: center;
             padding: 2rem;
             max-width: 90vw;
-            margin-top: -10vh; /* Pushes the content higher on mobile */
         }
 
         /* ========== Question Text ========== */
@@ -352,6 +351,14 @@
 
         /* ========== Mobile Responsiveness ========== */
         @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+            }
+
+            .container {
+                margin-top: 2rem;
+            }
+
             .btn {
                 padding: 0.8rem 2rem;
                 font-size: 1.1rem;
